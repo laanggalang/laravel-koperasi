@@ -31,8 +31,8 @@
                         </x-nav-link>
                     @endif
 
-                    <!-- 4. Menu PINJAMAN KREDIT: Untuk Admin, Ketua, Bendahara, Staff -->
-                    @if(in_array(auth()->user()->role, ['admin', 'ketua', 'bendahara', 'staff']))
+                    <!-- 4. Menu PINJAMAN KREDIT: Untuk Admin, Ketua, Bendahara, Staff, Pengurus -->
+                    @if(in_array(auth()->user()->role, ['admin', 'ketua', 'bendahara', 'staff', 'pengurus']))
                         <x-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*')">
                             {{ __('Pinjaman Kredit') }}
                         </x-nav-link>

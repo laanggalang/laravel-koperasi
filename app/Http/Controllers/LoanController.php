@@ -40,7 +40,8 @@ class LoanController extends Controller
             'monthly_payment' => round($monthly, 2),
             'total_payment' => round($total, 2),
             'remaining_balance' => round($total, 2),
-            'status' => 'active',
+            'status' => 'pending', 
+            //pinjaman baru otomatis status pending
         ]);
 
         return redirect()->route('loans.show',$loan)->with('success','Pinjaman berhasil dibuat.');

@@ -45,14 +45,19 @@ Route::middleware('auth')->group(function () {
      * Karena di tabel utama loans/index butuh dibaca oleh banyak role, rute internalnya kita pecah:
      */
     
-    // Fitur Ajukan & Simpan Pinjaman Baru: Hanya Admin (Sesuai matriks CRUD Admin)
-    Route::middleware('role:admin')->group(function () {
+    // A. Pengajuan Pinjaman: Hanya Admin & Ketua
+    Route::middleware('role:admin,ketua')->group(function () {
         Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
         Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
     });
 
-    // Fitur Lihat Daftar & Detail Pinjaman: Diizinkan untuk Admin, Ketua, Bendahara, dan Staff
-    Route::middleware('role:admin,ketua,bendahara,staff')->group(function () {
+    // B. Persetujuan Pinjaman: Hanya Admin & Pengurus
+    Route::middleware('role:admin,pengurus')->group(function (){
+        Route::put('/loans/{loan}', [LoanController::class, 'update'])->name('loans.update');
+    });
+
+    // C. Fitur Lihat Daftar & Detail Pinjaman: Diizinkan untuk Admin, Ketua, Bendahara, Staff dan Pengurus
+    Route::middleware('role:admin,ketua,bendahara,staff,pengurus')->group(function () {
         Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
         Route::get('/loans/{loan}', [LoanController::class, 'show'])->name('loans.show');
         // Catatan: Jika ada tombol edit/hapus/persetujuan di controller, bungkus route methodnya dengan middleware ketua/admin di sini nanti

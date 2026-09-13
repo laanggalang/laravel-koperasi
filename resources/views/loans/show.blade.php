@@ -76,6 +76,40 @@
             </div>
         </div>
 
+        <!-- 💡 BLOK BARU: TOMBOL PERSETUJUAN KREDIT (HANYA UNTUK ADMIN & PENGURUS) -->
+                @if(in_array(auth()->user()->role, ['admin', 'pengurus']) && strtolower($loan->status) === 'pending')
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-amber-50/50 border-amber-200">
+            <div class="mb-4 sm:mb-0">
+                <h4 class="text-sm font-bold text-amber-900 uppercase tracking-wider">Panel Persetujuan Kredit Pengurus</h4>
+                <p class="text-xs text-amber-700 mt-0.5">Tinjau pengajuan ini dengan saksama sebelum memberikan keputusan persetujuan dana.</p>
+            </div>
+            <div class="flex space-x-3">
+                <!-- Tombol Setujui (Mengubah status menjadi active) -->
+                <form action="{{ route('loans.update', $loan->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="active">
+                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin MENYETUJUI pengajuan pinjaman ini?')" 
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-bold shadow-sm transition-colors">
+                        ✔ Setujui (Aktifkan)
+                    </button>
+                </form>
+
+                <!-- Tombol Tolak / Batalkan (Mengubah status menjadi cancelled) -->
+                <form action="{{ route('loans.update', $loan->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="cancelled">
+                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin MENOLAK/MEMBATALKAN pengajuan pinjaman ini?')" 
+                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-bold shadow-sm transition-colors">
+                        ❌ Tolak Pengajuan
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endif
+
+
         <!-- History Cicilan Container -->
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
