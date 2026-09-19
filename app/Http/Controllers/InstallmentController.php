@@ -32,19 +32,21 @@ class InstallmentController extends Controller
             $loan = Loan::lockForUpdate()->findOrFail($data['loan_id']);
             $number = $loan->installments()->count() + 1;
             $amount = min((float)$data['amount'], (float)$loan->remaining_balance);
-    
-            // 💡 Tambahkan kata 'return' sebelum Installment::create
-            return Installment::create([
+
+            $installment = Installment::create([
                 ...$data,
                 'installment_no'=>$number,
                 'amount'=>$amount
             ]);
-    
+
+            // 💡 Update saldo & status pinjaman setelah angsuran dicatat
             $remaining = max(0, (float)$loan->remaining_balance - $amount);
             $loan->update([
                 'remaining_balance'=>$remaining,
                 'status'=>$remaining <= 0 ? 'paid' : 'active'
             ]);
+
+            return $installment;
         });
     
         // 💡 Sekarang variabel $installment sudah aman dilemparkan ke rute show

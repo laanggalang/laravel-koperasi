@@ -29,8 +29,8 @@ class LoanController extends Controller
             'notes'=>'nullable|string|max:500'
         ]);
 
-        // Flat interest: bunga total = pokok x rate x tenor / 100
-        $interest = $data['principal'] * ($data['interest_rate'] / 100) * $data['tenor'];
+        // Flat interest: bunga total = (pokok x rate / 100)  / tenor
+        $interest = $data['principal'] * ($data['interest_rate'] / 100);
         $total = $data['principal'] + $interest;
         $monthly = $total / $data['tenor'];
 
