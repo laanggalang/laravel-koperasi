@@ -57,13 +57,43 @@ class MemberController extends Controller
             'name'=>'required|string|max:150',
             'nik'=>'nullable|string|max:30','phone'=>'nullable|string|max:30',
             'email'=>'nullable|email|max:150','address'=>'nullable|string',
-            'join_date'=>'required|date','status'=>'required|in:active,inactive'
+            'join_date'=>'required|date','status'=>'required|in:active,inactive',
+            'exit_date'=>'nullable|date|after_or_equal:join_date',
         ]);
         $member->update($data);
         return redirect()->route('members.index')->with('success','Data anggota diperbarui.');
     }
 
+    public function updateStatus(Request $request, Member $member) {
+        $data = $request->validate([
+            'status'=>'required|in:active,inactive',
+            'exit_date'=>'required_if:status,inactive|nullable|date|after_or_equal:join_date',
+        ], [
+            'exit_date.required_if' => 'Tanggal keluar wajib diisi saat menonaktifkan anggota.',
+            'exit_date.after_or_equal' => 'Tanggal keluar tidak boleh sebelum tanggal gabung.',
+        ]);
+
+        if ($data['status'] === 'inactive' && $member->hasUnpaidLoans()) {
+            return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih memiliki pinjaman yang belum lunas (pending/aktif).');
+        }
+
+        $member->update([
+            'status'    => $data['status'],
+            'exit_date' => $data['status'] === 'inactive' ? $data['exit_date'] : null,
+        ]);
+
+        $message = $data['status'] === 'inactive'
+            ? 'Anggota dinonaktifkan per ' . \Carbon\Carbon::parse($data['exit_date'])->format('d-m-Y') . '.'
+            : 'Anggota berhasil diaktifkan kembali.';
+
+        return redirect()->route('members.show', $member)->with('success', $message);
+    }
+
     public function destroy(Member $member) {
+        if ($member->hasUnpaidLoans()) {
+            return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih memiliki pinjaman yang belum lunas (pending/aktif).');
+        }
+
         $member->update(['status'=>'inactive']);
         return back()->with('success','Anggota dinonaktifkan.');
     }

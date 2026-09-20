@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
      */
     Route::middleware('role:admin')->group(function () {
         Route::resource('/members', MemberController::class);
+        Route::put('/members/{member}/status', [MemberController::class, 'updateStatus'])->name('members.updateStatus');
     });
 
     /**
