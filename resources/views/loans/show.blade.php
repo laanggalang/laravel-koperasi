@@ -116,15 +116,15 @@
                 <h3 class="text-base font-bold text-gray-800">Riwayat Angsuran</h3>
             </div>
             <div class="p-6 overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="table-grid min-w-full">
+                    <thead>
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nominal</th>
+                            <th scope="col">No</th>
+                            <th scope="col">Tanggal</th>
+                            <th scope="col">Nominal</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         @foreach($loan->installments as $i)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono font-bold">{{ $i->installment_no }}</td>

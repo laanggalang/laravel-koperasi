@@ -9,9 +9,32 @@ use Illuminate\Support\Facades\DB;
 
 class InstallmentController extends Controller
 {
-    public function index() {
-        $installments = Installment::with('loan.member')->latest('paid_date')->paginate(20);
-        return view('installments.index', compact('installments'));
+    public function index(Request $request) {
+        $allowedSorts = [
+            'loan_no'        => 'loans.loan_no',
+            'member'         => 'members.name',
+            'installment_no' => 'installments.installment_no',
+            'paid_date'      => 'installments.paid_date',
+            'amount'         => 'installments.amount',
+        ];
+
+        $sortBy  = $allowedSorts[$request->query('sort_by')] ?? $allowedSorts['paid_date'];
+        $sortDir = strtolower($request->query('sort_dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $installments = Installment::query()
+            ->join('loans', 'loans.id', '=', 'installments.loan_id')
+            ->join('members', 'members.id', '=', 'loans.member_id')
+            ->select('installments.*')
+            ->with('loan.member')
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('installments.index', [
+            'installments' => $installments,
+            'sortBy'  => array_search($sortBy, $allowedSorts),
+            'sortDir' => $sortDir,
+        ]);
     }
 
     public function create() {

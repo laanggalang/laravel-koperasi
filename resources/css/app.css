@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Grid table: garis penuh termasuk pinggir, header fill + bold, zebra rows, hover highlight */
+    .table-grid {
+        @apply w-full border-collapse border border-gray-300;
+    }
+    .table-grid thead th {
+        @apply px-6 py-3.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider bg-green-400 border-b-2 border-b-gray-400 border-r border-r-gray-300;
+    }
+    .table-grid tbody td {
+        @apply px-6 py-4 text-sm border-b border-r border-gray-300;
+    }
+    .table-grid tbody tr:nth-child(even) {
+        @apply bg-gray-50/60;
+    }
+    .table-grid tbody tr:hover td {
+        @apply bg-indigo-50/70;
+        transition: background-color 150ms ease;
+    }
+}

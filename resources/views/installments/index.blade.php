@@ -25,17 +25,17 @@
         <!-- Table Card Section -->
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
             <div class="p-6 bg-white border-b border-gray-200 overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="table-grid min-w-full">
+                    <thead>
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No Pinjaman</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Anggota</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Angsuran Ke</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nominal</th>
+                            <x-sort-link column="loan_no" label="No Pinjaman" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="member" label="Anggota" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="installment_no" label="Angsuran Ke" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="paid_date" label="Tanggal" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="amount" label="Nominal" :sortBy="$sortBy" :sortDir="$sortDir" />
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         @forelse($installments as $i)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-indigo-600">
