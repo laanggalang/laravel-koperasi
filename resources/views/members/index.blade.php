@@ -20,10 +20,10 @@
                 <table class="table-grid min-w-full">
                     <thead>
                         <tr>
-                            <th scope="col">No Anggota</th>
-                            <th scope="col">Nama</th>
-                            <th scope="col">Telepon</th>
-                            <th scope="col">Status</th>
+                            <x-sort-link column="member_no" label="No Anggota" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="name" label="Nama" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="phone" label="Telepon" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="status" label="Status" :sortBy="$sortBy" :sortDir="$sortDir" />
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>

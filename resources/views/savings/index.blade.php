@@ -21,11 +21,11 @@
                 <table class="table-grid min-w-full">
                     <thead>
                         <tr>
-                            <th scope="col">No. Transaksi</th>
-                            <th scope="col">Nama Anggota</th>
-                            <th scope="col">Tanggal</th>
-                            <th scope="col">Jenis Simpanan</th>
-                            <th scope="col">Jumlah (Rp)</th>
+                            <x-sort-link column="id" label="No. Transaksi" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="member" label="Nama Anggota" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="transaction_date" label="Tanggal" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="type" label="Jenis Simpanan" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="amount" label="Jumlah (Rp)" :sortBy="$sortBy" :sortDir="$sortDir" />
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>

@@ -9,9 +9,33 @@ use Illuminate\Support\Str;
 
 class LoanController extends Controller
 {
-    public function index() {
-        $loans = Loan::with('member')->latest()->paginate(15);
-        return view('loans.index', compact('loans'));
+    public function index(Request $request) {
+        $allowedSorts = [
+            'loan_no'    => 'loans.loan_no',
+            'member'     => 'members.name',
+            'start_date' => 'loans.start_date',
+            'principal'  => 'loans.principal',
+            'tenor'      => 'loans.tenor',
+            'status'     => 'loans.status',
+            'newest'     => 'loans.created_at',
+        ];
+
+        $sortBy  = $allowedSorts[$request->query('sort_by')] ?? $allowedSorts['newest'];
+        $sortDir = strtolower($request->query('sort_dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $loans = Loan::query()
+            ->join('members', 'members.id', '=', 'loans.member_id')
+            ->select('loans.*')
+            ->with('member')
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('loans.index', [
+            'loans' => $loans,
+            'sortBy'  => array_search($sortBy, $allowedSorts),
+            'sortDir' => $sortDir,
+        ]);
     }
 
     public function create() {

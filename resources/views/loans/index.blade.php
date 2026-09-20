@@ -21,12 +21,12 @@
                 <table class="table-grid min-w-full">
                     <thead>
                         <tr>
-                            <th scope="col">No. Kode</th>
-                            <th scope="col">Nama Anggota</th>
-                            <th scope="col">Tanggal Pinjam</th>
-                            <th scope="col">Jumlah Pokok (Rp)</th>
-                            <th scope="col">Tenor</th>
-                            <th scope="col">Status</th>
+                            <x-sort-link column="loan_no" label="No. Kode" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="member" label="Nama Anggota" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="start_date" label="Tanggal Pinjam" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="principal" label="Jumlah Pokok (Rp)" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="tenor" label="Tenor" :sortBy="$sortBy" :sortDir="$sortDir" />
+                            <x-sort-link column="status" label="Status" :sortBy="$sortBy" :sortDir="$sortDir" />
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>

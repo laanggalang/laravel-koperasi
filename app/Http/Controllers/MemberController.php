@@ -7,9 +7,27 @@ use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
-    public function index() {
-        $members = Member::latest()->paginate(15);
-        return view('members.index', compact('members'));
+    public function index(Request $request) {
+        $allowedSorts = [
+            'member_no' => 'members.member_no',
+            'name'      => 'members.name',
+            'phone'     => 'members.phone',
+            'status'    => 'members.status',
+            'newest'    => 'members.created_at',
+        ];
+
+        $sortBy  = $allowedSorts[$request->query('sort_by')] ?? $allowedSorts['newest'];
+        $sortDir = strtolower($request->query('sort_dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $members = Member::orderBy($sortBy, $sortDir)
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('members.index', [
+            'members' => $members,
+            'sortBy'  => array_search($sortBy, $allowedSorts),
+            'sortDir' => $sortDir,
+        ]);
     }
 
     public function create() { return view('members.create'); }

@@ -8,9 +8,31 @@ use Illuminate\Http\Request;
 
 class SavingController extends Controller
 {
-    public function index() {
-        $savings = Saving::with('member')->latest('transaction_date')->paginate(20);
-        return view('savings.index', compact('savings'));
+    public function index(Request $request) {
+        $allowedSorts = [
+            'id'               => 'savings.id',
+            'member'           => 'members.name',
+            'transaction_date' => 'savings.transaction_date',
+            'type'             => 'savings.type',
+            'amount'           => 'savings.amount',
+        ];
+
+        $sortBy  = $allowedSorts[$request->query('sort_by')] ?? $allowedSorts['transaction_date'];
+        $sortDir = strtolower($request->query('sort_dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $savings = Saving::query()
+            ->join('members', 'members.id', '=', 'savings.member_id')
+            ->select('savings.*')
+            ->with('member')
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('savings.index', [
+            'savings' => $savings,
+            'sortBy'  => array_search($sortBy, $allowedSorts),
+            'sortDir' => $sortDir,
+        ]);
     }
 
     public function create() {
