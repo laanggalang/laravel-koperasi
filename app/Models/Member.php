@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Member extends Model
 {
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $model) {
+            $model->uuid ??= (string) \Illuminate\Support\Str::uuid();
+        });
+    }
+
     protected $fillable = [
         'member_no','name','nik','phone','email','address','join_date','exit_date','status'
     ];

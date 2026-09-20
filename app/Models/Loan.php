@@ -8,6 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Loan extends Model
 {
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $model) {
+            $model->uuid ??= (string) \Illuminate\Support\Str::uuid();
+        });
+    }
+
     protected $fillable = [
         'member_id','loan_no','principal','interest_rate','tenor',
         'monthly_payment','total_payment','remaining_balance',

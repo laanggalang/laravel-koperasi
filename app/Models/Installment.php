@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Installment extends Model
 {
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $model) {
+            $model->uuid ??= (string) \Illuminate\Support\Str::uuid();
+        });
+    }
+
     protected $fillable = ['loan_id','installment_no','amount','paid_date','notes'];
     protected $casts = ['paid_date'=>'date','amount'=>'decimal:2'];
     public function loan(): BelongsTo { return $this->belongsTo(Loan::class); }

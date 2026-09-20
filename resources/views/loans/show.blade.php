@@ -85,7 +85,7 @@
             </div>
             <div class="flex space-x-3">
                 <!-- Tombol Setujui (Mengubah status menjadi active) -->
-                <form action="{{ route('loans.update', $loan->id) }}" method="POST">
+                <form action="{{ route('loans.update', $loan) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="status" value="active">
@@ -96,7 +96,7 @@
                 </form>
 
                 <!-- Tombol Tolak / Batalkan (Mengubah status menjadi cancelled) -->
-                <form action="{{ route('loans.update', $loan->id) }}" method="POST">
+                <form action="{{ route('loans.update', $loan) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="status" value="cancelled">
