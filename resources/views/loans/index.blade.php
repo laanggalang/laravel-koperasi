@@ -1,86 +1,92 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-12 bg-gray-100 min-h-screen">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        
-        <!-- Header Section -->
-        <div class="flex justify-between items-center mb-6 bg-white p-6 rounded-lg shadow-sm">
+<div class="max-w-7xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">Data Pinjaman Anggota</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Kelola, tinjau, dan pantau pengajuan serta status pinjaman anggota.</p>
+        </div>
+        <a href="{{ route('loans.create') }}" class="btn-primary">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Ajukan Pinjaman
+        </a>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card">
+        <div class="card-header">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">Data Pinjaman Anggota</h2>
-                <p class="text-sm text-gray-500 mt-1">Kelola, tinjau, dan pantau pengajuan serta status pinjaman anggota.</p>
+                <h3 class="card-title">Daftar Pinjaman</h3>
+                <p class="card-subtitle">{{ $loans->total() }} transaksi pinjaman</p>
             </div>
-            <a href="{{ route('loans.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                + Ajukan Pinjaman
-            </a>
+        </div>
+        <div class="overflow-x-auto px-6 py-5">
+            <table class="table-grid min-w-full">
+                <thead>
+                    <tr>
+                        <x-sort-link column="loan_no" label="No. Kode" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <x-sort-link column="member" label="Nama Anggota" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <x-sort-link column="start_date" label="Tanggal Pinjam" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <x-sort-link column="principal" label="Jumlah Pokok (Rp)" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <x-sort-link column="tenor" label="Tenor" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <x-sort-link column="status" label="Status" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <th scope="col">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($loans as $l)
+                    <tr>
+                        <td class="whitespace-nowrap font-mono font-semibold text-gray-900">
+                            LN-{{ sprintf('%04d', $l->id) }}
+                        </td>
+                        <td class="whitespace-nowrap text-gray-700">
+                            {{ $l->member->name ?? 'Tidak Diketahui' }}
+                        </td>
+                        <td class="whitespace-nowrap text-gray-500">
+                            {{ \Carbon\Carbon::parse($l->start_date ?? $l->created_at)->format('d-m-Y') }}
+                        </td>
+                        <td class="whitespace-nowrap font-bold text-red-600">
+                            Rp {{ number_format($l->principal, 0, ',', '.') }}
+                        </td>
+                        <td class="whitespace-nowrap text-gray-700">
+                            {{ $l->tenor ?? 0 }} Bulan
+                        </td>
+                        <td class="whitespace-nowrap">
+                            @php
+                                $status = strtolower($l->status ?? 'pending');
+                                $badgeClass = match ($status) {
+                                    'active', 'aktif' => 'badge-success',
+                                    'paid', 'lunas' => 'badge-info',
+                                    'rejected', 'ditolak', 'cancelled' => 'badge-danger',
+                                    default => 'badge-warning',
+                                };
+                            @endphp
+                            <span class="{{ $badgeClass }}">{{ $l->status ?? 'Pending' }}</span>
+                        </td>
+                        <td class="whitespace-nowrap">
+                            <a href="{{ route('loans.show', $l) }}" class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                                Detail
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="py-12 text-sm text-center text-gray-400 italic">
+                            Belum ada data transaksi pinjaman.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
-        <!-- Table Card Section -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200 overflow-x-auto">
-                <table class="table-grid min-w-full">
-                    <thead>
-                        <tr>
-                            <x-sort-link column="loan_no" label="No. Kode" :sortBy="$sortBy" :sortDir="$sortDir" />
-                            <x-sort-link column="member" label="Nama Anggota" :sortBy="$sortBy" :sortDir="$sortDir" />
-                            <x-sort-link column="start_date" label="Tanggal Pinjam" :sortBy="$sortBy" :sortDir="$sortDir" />
-                            <x-sort-link column="principal" label="Jumlah Pokok (Rp)" :sortBy="$sortBy" :sortDir="$sortDir" />
-                            <x-sort-link column="tenor" label="Tenor" :sortBy="$sortBy" :sortDir="$sortDir" />
-                            <x-sort-link column="status" label="Status" :sortBy="$sortBy" :sortDir="$sortDir" />
-                            <th scope="col">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($loans as $l)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                LN-{{ sprintf('%04d', $l->id) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                {{ $l->member->name ?? 'Tidak Diketahui' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ \Carbon\Carbon::parse($l->loan_date)->format('d-m-Y') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">
-                                Rp {{ number_format($l->principal, 0, ',', '.') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                {{ $l->tenor ?? $l->jangka_waktu ?? 0 }} Bulan
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $status = strtolower($l->status ?? 'pending');
-                                    $colorClass = 'bg-blue-100 text-blue-800';
-                                    if ($status == 'approved' || $status == 'lunas' || $status == 'aktif' || $status == 'active') {
-                                        $colorClass = 'bg-emerald-100 text-emerald-800';
-                                    } elseif ($status == 'rejected' || $status == 'ditolak' || $status == 'cancelled') {
-                                        $colorClass = 'bg-red-100 text-red-800';
-                                    }
-                                @endphp
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full {{ $colorClass }} uppercase">
-                                    {{ $l->status ?? 'Pending' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('loans.show', $l) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded transition-colors">Detail</a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-10 whitespace-nowrap text-sm text-center text-gray-400 italic">
-                                Belum ada data transaksi pinjaman.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-
-                <!-- Pagination Section -->
-                <div class="mt-6">
-                    {{ $loans->links() }}
-                </div>
-            </div>
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-100">
+            {{ $loans->links() }}
         </div>
     </div>
 </div>

@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-12 bg-gray-100 min-h-screen">
-    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+<div class="max-w-3xl mx-auto space-y-6">
 
         <!-- Tombol Kembali -->
         <div class="mb-4">
@@ -24,7 +23,7 @@
         @endif
 
         <!-- Profile Card Container -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="card">
             <!-- Card Header -->
             <div class="bg-indigo-600 px-6 py-6 flex items-center space-x-4">
                 <div class="p-3 bg-indigo-500 rounded-full text-white shadow-inner">
@@ -171,7 +170,5 @@
                 @endif
             </div>
         </div>
-
     </div>
-</div>
 @endsection
