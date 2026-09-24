@@ -23,6 +23,9 @@
                 <h3 class="card-title">Data Anggota Koperasi</h3>
                 <p class="card-subtitle">{{ $members->total() }} anggota terdaftar</p>
             </div>
+            <form method="GET" action="{{ route('members.index') }}" class="w-full sm:w-auto">
+                <x-search-box placeholder="Cari nama, no. anggota, telepon..." />
+            </form>
         </div>
         <div class="overflow-x-auto px-6 py-5">
             <table class="table-grid min-w-full">

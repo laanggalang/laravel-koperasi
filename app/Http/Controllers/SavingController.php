@@ -24,6 +24,12 @@ class SavingController extends Controller
             ->join('members', 'members.id', '=', 'savings.member_id')
             ->select('savings.*')
             ->with('member')
+            ->when($request->query('q'), function ($query, $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('members.name', 'like', "%{$term}%")
+                      ->orWhere('savings.type', 'like', "%{$term}%");
+                });
+            })
             ->orderBy($sortBy, $sortDir)
             ->paginate(20)
             ->withQueryString();

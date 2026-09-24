@@ -32,4 +32,15 @@ class Member extends Model
     {
         return $this->loans()->whereIn('status', ['pending', 'active'])->exists();
     }
+
+    public function scopeSearch($query, ?string $term)
+    {
+        if (!$term) return $query;
+        return $query->where(function ($q) use ($term) {
+            $q->where('name', 'like', "%{$term}%")
+              ->orWhere('member_no', 'like', "%{$term}%")
+              ->orWhere('phone', 'like', "%{$term}%")
+              ->orWhere('email', 'like', "%{$term}%");
+        });
+    }
 }

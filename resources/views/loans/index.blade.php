@@ -23,6 +23,9 @@
                 <h3 class="card-title">Daftar Pinjaman</h3>
                 <p class="card-subtitle">{{ $loans->total() }} transaksi pinjaman</p>
             </div>
+            <form method="GET" action="{{ route('loans.index') }}" class="w-full sm:w-auto">
+                <x-search-box placeholder="Cari kode, nama, status..." />
+            </form>
         </div>
         <div class="overflow-x-auto px-6 py-5">
             <table class="table-grid min-w-full">

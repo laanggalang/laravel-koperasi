@@ -19,7 +19,9 @@ class MemberController extends Controller
         $sortBy  = $allowedSorts[$request->query('sort_by')] ?? $allowedSorts['newest'];
         $sortDir = strtolower($request->query('sort_dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
-        $members = Member::orderBy($sortBy, $sortDir)
+        $members = Member::query()
+            ->search($request->query('q'))
+            ->orderBy($sortBy, $sortDir)
             ->paginate(15)
             ->withQueryString();
 

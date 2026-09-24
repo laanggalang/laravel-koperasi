@@ -23,6 +23,9 @@
                 <h3 class="card-title">Riwayat Simpanan</h3>
                 <p class="card-subtitle">{{ $savings->total() }} transaksi tercatat</p>
             </div>
+            <form method="GET" action="{{ route('savings.index') }}" class="w-full sm:w-auto">
+                <x-search-box placeholder="Cari nama anggota, jenis..." />
+            </form>
         </div>
         <div class="overflow-x-auto px-6 py-5">
             <table class="table-grid min-w-full">

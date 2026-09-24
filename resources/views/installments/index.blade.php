@@ -30,6 +30,9 @@
                 <h3 class="card-title">Catatan Angsuran (Cicilan)</h3>
                 <p class="card-subtitle">{{ $installments->total() }} pembayaran tercatat</p>
             </div>
+            <form method="GET" action="{{ route('installments.index') }}" class="w-full sm:w-auto">
+                <x-search-box placeholder="Cari no. pinjaman, anggota..." />
+            </form>
         </div>
         <div class="overflow-x-auto px-6 py-5">
             <table class="table-grid min-w-full">

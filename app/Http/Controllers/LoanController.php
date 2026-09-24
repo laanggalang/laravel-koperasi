@@ -27,6 +27,13 @@ class LoanController extends Controller
             ->join('members', 'members.id', '=', 'loans.member_id')
             ->select('loans.*')
             ->with('member')
+            ->when($request->query('q'), function ($query, $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('loans.loan_no', 'like', "%{$term}%")
+                      ->orWhere('members.name', 'like', "%{$term}%")
+                      ->orWhere('loans.status', 'like', "%{$term}%");
+                });
+            })
             ->orderBy($sortBy, $sortDir)
             ->paginate(15)
             ->withQueryString();
