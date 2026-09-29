@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -28,5 +29,23 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return null;
+        });
+
+        // CSRF token mismatch (419): arahkan user ke halaman yang ramah, bukan halaman error
+        // Catatan: Laravel 11 mengubah TokenMismatchException menjadi HttpException(419) sebelum render callbacks
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Sesi telah berakhir. Silakan muat ulang halaman dan coba lagi.',
+                ], 419);
+            }
+
+            return redirect()
+                ->route(auth()->check() ? 'dashboard' : 'login')
+                ->with('error', 'Sesi Anda telah berakhir demi keamanan. Silakan coba lagi.');
         });
     })->create();
