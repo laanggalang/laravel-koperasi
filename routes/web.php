@@ -6,6 +6,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\InstallmentController;
+use App\Http\Controllers\DoorNumberController;
 use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
@@ -30,6 +31,14 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('/members', MemberController::class);
         Route::put('/members/{member}/status', [MemberController::class, 'updateStatus'])->name('members.updateStatus');
+
+        // 🚪 Nomor Pintu (aset koperasi yang disewakan ke anggota)
+        Route::resource('/door-numbers', DoorNumberController::class);
+        Route::put('/door-numbers/{door_number}/status', [DoorNumberController::class, 'updateStatus'])->name('door-numbers.updateStatus');
+        Route::get('/door-numbers/{door_number}/transfer', [DoorNumberController::class, 'transferForm'])->name('door-numbers.transferForm');
+        Route::post('/door-numbers/{door_number}/transfer', [DoorNumberController::class, 'transfer'])->name('door-numbers.transfer');
+        Route::get('/door-numbers-exchange', [DoorNumberController::class, 'exchangeForm'])->name('door-numbers.exchangeForm');
+        Route::post('/door-numbers-exchange', [DoorNumberController::class, 'exchange'])->name('door-numbers.exchange');
     });
 
     /**

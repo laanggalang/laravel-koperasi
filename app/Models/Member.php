@@ -27,10 +27,22 @@ class Member extends Model
 
     public function savings(): HasMany { return $this->hasMany(Saving::class); }
     public function loans(): HasMany { return $this->hasMany(Loan::class); }
+    public function doorNumbers(): HasMany { return $this->hasMany(DoorNumber::class); }
 
     public function hasUnpaidLoans(): bool
     {
         return $this->loans()->whereIn('status', ['pending', 'active'])->exists();
+    }
+
+    /**
+     * GUARD: apakah semua hak & kewajiban nomor pintu milik anggota ini sudah beres?
+     * Agregat dari DoorNumber::hasSettledObligations() tiap nomor pintu miliknya.
+     */
+    public function hasAllDoorNumbersSettled(): bool
+    {
+        return $this->doorNumbers()
+            ->get()
+            ->every(fn (DoorNumber $np) => $np->hasSettledObligations());
     }
 
     public function scopeSearch($query, ?string $term)

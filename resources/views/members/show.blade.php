@@ -101,6 +101,49 @@
                 </div>
             </div>
 
+            <!-- Section Nomor Pintu -->
+            @php $memberDoorNumbers = $member->doorNumbers()->orderBy('door_no')->get(); @endphp
+            <div class="p-6 border-b border-gray-200 bg-gray-50/50">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-base font-bold text-gray-800">Nomor Pintu</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">{{ $memberDoorNumbers->count() }} aset terdaftar atas nama anggota ini.</p>
+                    </div>
+                    @if(($member->status ?? 'active') === 'active')
+                        <a href="{{ route('door-numbers.create', ['member_id' => $member->id]) }}" class="btn-secondary">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Tambah
+                        </a>
+                    @endif
+                </div>
+
+                @if($memberDoorNumbers->isEmpty())
+                    <p class="text-sm text-gray-400 italic bg-white border border-gray-100 rounded-lg p-4">
+                        Belum memiliki nomor pintu.
+                    </p>
+                @else
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach($memberDoorNumbers as $np)
+                        <a href="{{ route('door-numbers.show', $np) }}" class="flex items-center justify-between bg-white border border-gray-200 hover:border-indigo-300 rounded-lg p-3.5 transition-colors group">
+                            <div>
+                                <p class="font-mono font-bold text-indigo-600 text-sm group-hover:text-indigo-700">{{ $np->door_no }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ $np->plate_no }} @if($np->vehicle_type) • {{ $np->vehicle_type }} @endif</p>
+                            </div>
+                            @if($np->isActive())
+                                <span class="badge-success">Aktif</span>
+                            @elseif($np->isAvailable())
+                                <span class="badge-warning">Tersedia</span>
+                            @else
+                                <span class="badge bg-gray-100 text-gray-600">Nonaktif</span>
+                            @endif
+                        </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
             <!-- Panel Aksi Status Keanggotaan -->
             @php
                 $hasUnpaidLoans = $member->hasUnpaidLoans();

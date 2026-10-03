@@ -75,8 +75,14 @@ class MemberController extends Controller
             'exit_date.after_or_equal' => 'Tanggal keluar tidak boleh sebelum tanggal gabung.',
         ]);
 
-        if ($data['status'] === 'inactive' && $member->hasUnpaidLoans()) {
-            return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih memiliki pinjaman yang belum lunas (pending/aktif).');
+        if ($data['status'] === 'inactive') {
+            if ($member->hasUnpaidLoans()) {
+                return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih memiliki pinjaman yang belum lunas (pending/aktif).');
+            }
+
+            if (!$member->hasAllDoorNumbersSettled()) {
+                return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih ada nomor pintu yang hak dan kewajibannya belum selesai.');
+            }
         }
 
         $member->update([
@@ -94,6 +100,10 @@ class MemberController extends Controller
     public function destroy(Member $member) {
         if ($member->hasUnpaidLoans()) {
             return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih memiliki pinjaman yang belum lunas (pending/aktif).');
+        }
+
+        if (!$member->hasAllDoorNumbersSettled()) {
+            return back()->with('error', 'Anggota tidak dapat dinonaktifkan karena masih ada nomor pintu yang hak dan kewajibannya belum selesai.');
         }
 
         $member->update(['status'=>'inactive']);
