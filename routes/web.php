@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/door-numbers/{door_number}/transfer', [DoorNumberController::class, 'transfer'])->name('door-numbers.transfer');
         Route::get('/door-numbers-exchange', [DoorNumberController::class, 'exchangeForm'])->name('door-numbers.exchangeForm');
         Route::post('/door-numbers-exchange', [DoorNumberController::class, 'exchange'])->name('door-numbers.exchange');
+        Route::get('/door-numbers-claim', [DoorNumberController::class, 'claimForm'])->name('door-numbers.claimForm');
+        Route::post('/door-numbers-claim', [DoorNumberController::class, 'claim'])->name('door-numbers.claim');
     });
 
     /**

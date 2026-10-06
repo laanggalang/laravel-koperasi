@@ -13,6 +13,12 @@
             <p class="text-sm text-gray-500 mt-0.5">Kelola aset nomor pintu (pengemudi) milik koperasi.</p>
         </div>
         <div class="flex gap-2">
+            <a href="{{ route('door-numbers.claimForm') }}" class="btn-success">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                Ambil
+            </a>
             <a href="{{ route('door-numbers.exchangeForm') }}" class="btn-secondary">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
@@ -23,7 +29,7 @@
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                Tambah Nomor Pintu
+                Tambah
             </a>
         </div>
     </div>
@@ -33,7 +39,9 @@
         <div class="card-header">
             <div>
                 <h3 class="card-title">Daftar Nomor Pintu</h3>
-                <p class="card-subtitle">{{ $doorNumbers->total() }} aset terdaftar</p>
+                <p class="card-subtitle">{{ $doorNumbers->total() }} Nomor Pintu Terdaftar</p>
+                <p class="card-subtitle">{{ $activeDoorNumbers }} Nomor Pintu Aktif</p>
+                <p class="card-subtitle">{{ $availableDoorNumbers }} Nomor Pintu Tersedia</p>
             </div>
             <form method="GET" action="{{ route('door-numbers.index') }}" class="w-full sm:w-auto">
                 <x-search-box placeholder="Cari no. pintu, plat, pemegang..." />

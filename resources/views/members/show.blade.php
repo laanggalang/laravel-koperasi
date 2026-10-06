@@ -110,12 +110,17 @@
                         <p class="text-xs text-gray-500 mt-0.5">{{ $memberDoorNumbers->count() }} aset terdaftar atas nama anggota ini.</p>
                     </div>
                     @if(($member->status ?? 'active') === 'active')
-                        <a href="{{ route('door-numbers.create', ['member_id' => $member->id]) }}" class="btn-secondary">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            Tambah
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('door-numbers.claimForm', ['member_id' => $member->id]) }}" class="btn-secondary">
+                                Ambil
+                            </a>
+                            <a href="{{ route('door-numbers.create') }}" class="btn-secondary">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Daftar Baru
+                            </a>
+                        </div>
                     @endif
                 </div>
 

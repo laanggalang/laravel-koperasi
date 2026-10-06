@@ -33,53 +33,177 @@ class DoorNumberController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $activeDoorNumbers = DoorNumber::where('status','active')
+            ->count();
+
+        $availableDoorNumbers = DoorNumber::where('status','available')
+            ->count();
+
         return view('door_numbers.index', [
             'doorNumbers' => $doorNumbers,
+            'activeDoorNumbers' => $activeDoorNumbers,
+            'availableDoorNumbers' => $availableDoorNumbers,
             'sortBy'  => array_search($sortBy, $allowedSorts),
             'sortDir' => $sortDir,
         ]);
     }
 
     public function create(Request $request) {
-        $members = Member::where('status', 'active')->orderBy('name')->get();
-        $preselectId = $request->query('member_id');
-
-        return view('door_numbers.create', compact('members', 'preselectId'));
+        return view('door_numbers.create');
     }
 
+    /**
+     * Daftarkan nomor pintu ke pool KBP: status default AVAILABLE, tanpa pemegang.
+     * Mendukung pendaftaran tunggal (NP-101) maupun rentang (NP-001 s/d NP-100).
+     */
     public function store(Request $request) {
         $data = $request->validate([
-            'member_id'       => 'required|exists:members,id',
-            'door_no'         => 'required|string|max:30|unique:door_numbers,door_no',
-            'driver_name'     => 'nullable|string|max:150',
-            'plate_no'        => 'required|string|max:15',
-            'vehicle_type'    => 'nullable|string|max:50',
+            'mode'            => 'required|in:single,range',
+            'door_no'         => 'required_if:mode,single|nullable|string|max:30|unique:door_numbers,door_no',
+            'door_no_start'   => 'required_if:mode,range|nullable|string|max:30',
+            'door_no_end'     => 'required_if:mode,range|nullable|string|max:30|different:door_no_start',
             'registered_date' => 'required|date',
+            'notes'           => 'nullable|string|max:500',
+        ], [
+            'door_no.unique'          => 'Nomor pintu tersebut sudah terdaftar.',
+            'door_no_end.different'   => 'Nomor akhir harus berbeda dengan nomor awal.',
         ]);
 
-        $member = Member::findOrFail($data['member_id']);
-        if ($member->status !== 'active') {
-            return back()->withInput()->with('error', 'Nomor pintu hanya dapat didaftarkan pada anggota berstatus aktif.');
+        // Parse nomor: harus pola [prefix][angka]
+        $parse = fn (string $s) => preg_match('/^(.*?)(\d+)$/u', trim($s), $m) ? [$m[1], (int) $m[2], strlen($m[2])] : null;
+
+        if ($data['mode'] === 'single') {
+            $items = [[$data['door_no'], $data['door_no']]];
+        } else {
+            $start = $parse($data['door_no_start']);
+            $end   = $parse($data['door_no_end']);
+
+            if (!$start || !$end) {
+                return back()->withInput()->with('error', 'Nomor harus diakhiri angka. Contoh: NP-001 s/d NP-100.');
+            }
+            if ($start[0] !== $end[0]) {
+                return back()->withInput()->with('error', 'Awalan (prefix) nomor awal dan akhir harus sama. Contoh: NP-001 s/d NP-100.');
+            }
+            if ($end[1] <= $start[1]) {
+                return back()->withInput()->with('error', 'Nomor akhir harus lebih besar dari nomor awal.');
+            }
+            if ($end[1] - $start[1] + 1 > 500) {
+                return back()->withInput()->with('error', 'Maksimal 500 nomor pintu per pendaftaran rentang.');
+            }
+
+            $pad = max($start[2], $end[2]);
+            $items = [];
+            for ($i = $start[1]; $i <= $end[1]; $i++) {
+                $items[] = [$start[0] . str_pad((string) $i, $pad, '0', STR_PAD_LEFT), null];
+            }
         }
 
-        $doorNumber = DB::transaction(function () use ($data, $request) {
-            $np = DoorNumber::create($data + ['status' => DoorNumber::STATUS_ACTIVE]);
+        // Cek duplikat sebelum menulis (redirect ramah, bukan error page)
+        $doorNos = array_column($items, 0);
+        $existing = DoorNumber::whereIn('door_no', $doorNos)->pluck('door_no')->all();
+        if ($existing) {
+            return back()->withInput()->with('error', 'Pendaftaran dibatalkan — nomor pintu sudah terdaftar: '
+                . implode(', ', array_slice($existing, 0, 5)) . (count($existing) > 5 ? ', dan ' . (count($existing) - 5) . ' lainnya' : '')
+                . '. Tidak ada data yang tersimpan.');
+        }
 
+        $created = DB::transaction(function () use ($items, $data, $request) {
+            $doorNumbers = collect();
+
+            foreach ($items as [$doorNo, $explicit]) {
+                $np = DoorNumber::create([
+                    'member_id'       => null,
+                    'door_no'         => $doorNo,
+                    'plate_no'        => null,
+                    'vehicle_type'    => null,
+                    'driver_name'     => null,
+                    'status'          => DoorNumber::STATUS_AVAILABLE,
+                    'registered_date' => $data['registered_date'],
+                ]);
+
+                DoorNumberHistory::create([
+                    'door_number_id' => $np->id,
+                    'from_member_id' => null,
+                    'to_member_id'   => null,
+                    'action'         => DoorNumberHistory::ACTION_REGISTERED,
+                    'action_date'    => $np->registered_date,
+                    'notes'          => $data['notes'] ?? 'Didaftarkan ke pool KBP.',
+                    'performed_by'   => auth()->id(),
+                ]);
+
+                $doorNumbers->push($np);
+            }
+
+            return $doorNumbers;
+        });
+
+        $message = $data['mode'] === 'single'
+            ? 'Nomor pintu ' . $created->first()->door_no . ' berhasil didaftarkan ke pool KBP.'
+            : count($created) . ' nomor pintu (' . $created->first()->door_no . ' s/d ' . $created->last()->door_no . ') berhasil didaftarkan ke pool KBP.';
+
+        return redirect()
+            ->route($data['mode'] === 'single' ? 'door-numbers.show' : 'door-numbers.index', $data['mode'] === 'single' ? $created->first() : [])
+            ->with('success', $message);
+    }
+
+    /**
+     * Halaman pengambilan nomor pintu dari pool KBP oleh anggota.
+     */
+    public function claimForm(Request $request) {
+        $members = Member::where('status', 'active')->orderBy('name')->get();
+        $available = DoorNumber::where('status', DoorNumber::STATUS_AVAILABLE)->orderBy('door_no')->get();
+        $preselectDoor = $request->query('door_number');
+        $preselectMember = $request->query('member_id');
+
+        return view('door_numbers.claim', compact('members', 'available', 'preselectDoor', 'preselectMember'));
+    }
+
+    /**
+     * Anggota aktif mengambil nomor pintu available: langsung ACTIVE + nempel ke dia.
+     */
+    public function claim(Request $request) {
+        $data = $request->validate([
+            'member_id'    => 'required|exists:members,id',
+            'door_number'  => 'required|exists:door_numbers,id',
+            'driver_name'  => 'nullable|string|max:150',
+            'plate_no'     => 'nullable|string|max:15',
+            'vehicle_type' => 'nullable|string|max:50',
+            'claim_date'   => 'required|date',
+        ]);
+
+        $np = DoorNumber::findOrFail($data['door_number']);
+        $member = Member::findOrFail($data['member_id']);
+
+        if (!$np->isAvailable()) {
+            return back()->withInput()->with('error', 'Nomor pintu tersebut tidak tersedia (sudah diambil atau dinonaktifkan).');
+        }
+
+        if ($member->status !== 'active') {
+            return back()->withInput()->with('error', 'Hanya anggota berstatus aktif yang dapat mengambil nomor pintu.');
+        }
+
+        DB::transaction(function () use ($np, $member, $data) {
             DoorNumberHistory::create([
                 'door_number_id' => $np->id,
                 'from_member_id' => null,
-                'to_member_id'   => $np->member_id,
-                'action'         => DoorNumberHistory::ACTION_REGISTERED,
-                'action_date'    => $np->registered_date,
-                'notes'          => 'Pendaftaran nomor pintu baru.',
+                'to_member_id'   => $member->id,
+                'action'         => DoorNumberHistory::ACTION_TRANSFERRED,
+                'action_date'    => $data['claim_date'],
+                'notes'          => 'Diambil dari pool KBP' . ($data['plate_no'] ? ' — plat ' . $data['plate_no'] : '') . '.',
                 'performed_by'   => auth()->id(),
             ]);
 
-            return $np;
+            $np->update([
+                'member_id'    => $member->id,
+                'status'       => DoorNumber::STATUS_ACTIVE,
+                'driver_name'  => $data['driver_name'] ?? null,
+                'plate_no'     => $data['plate_no'] ?? null,
+                'vehicle_type' => $data['vehicle_type'] ?? null,
+            ]);
         });
 
-        return redirect()->route('door-numbers.show', $doorNumber)
-            ->with('success', 'Nomor pintu ' . $doorNumber->door_no . ' berhasil didaftarkan.');
+        return redirect()->route('door-numbers.show', $np)
+            ->with('success', 'Nomor pintu ' . $np->door_no . ' berhasil diambil oleh ' . $member->name . ' dan kini aktif.');
     }
 
     public function show(DoorNumber $doorNumber) {

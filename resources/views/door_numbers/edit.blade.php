@@ -49,8 +49,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label for="plate_no" class="block text-sm font-medium text-gray-700">Plat Nomor <span class="text-red-500">*</span></label>
-                    <input type="text" name="plate_no" id="plate_no" value="{{ old('plate_no', $doorNumber->plate_no) }}" required
+                    <label for="plate_no" class="block text-sm font-medium text-gray-700">Plat Nomor</label>
+                    <input type="text" name="plate_no" id="plate_no" value="{{ old('plate_no', $doorNumber->plate_no) }}"
+                        placeholder="cth: D 1234 ABC"
                         class="form-input-custom mt-1 block w-full uppercase">
                     @error('plate_no') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
