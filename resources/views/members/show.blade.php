@@ -111,15 +111,16 @@
                     </div>
                     @if(($member->status ?? 'active') === 'active')
                         <div class="flex gap-2">
-                            <a href="{{ route('door-numbers.claimForm', ['member_id' => $member->id]) }}" class="btn-secondary">
-                                Ambil
+                            <a href="{{ route('door-numbers.claimForm', ['member_id' => $member->id]) }}" class="btn-success">
+                                Ambil Pintu
                             </a>
-                            <a href="{{ route('door-numbers.create') }}" class="btn-secondary">
+                            <!-- CREATE NOMOR PINTU BARU HANYA BISA DI MENU NOMOR PINTU -->
+                            <!-- <a href="{{ route('door-numbers.create') }}" class="btn-secondary">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
                                 Daftar Baru
-                            </a>
+                            </a> -->
                         </div>
                     @endif
                 </div>

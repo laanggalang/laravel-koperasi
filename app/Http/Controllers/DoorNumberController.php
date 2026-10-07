@@ -13,6 +13,7 @@ class DoorNumberController extends Controller
     public function index(Request $request) {
         $allowedSorts = [
             'door_no'         => 'door_numbers.door_no',
+            'member_no'       => 'members.member_no',
             'member'          => 'members.name',
             'driver'          => 'door_numbers.driver_name',
             'plate'           => 'door_numbers.plate_no',

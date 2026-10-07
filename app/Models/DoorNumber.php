@@ -83,7 +83,8 @@ class DoorNumber extends Model
               ->orWhere('plate_no', 'like', "%{$term}%")
               ->orWhere('driver_name', 'like', "%{$term}%")
               ->orWhere('vehicle_type', 'like', "%{$term}%")
-              ->orWhereHas('member', fn ($m) => $m->where('name', 'like', "%{$term}%"));
+              ->orWhereHas('member', fn ($m) => $m->where('name', 'like', "%{$term}%"))
+              ->orWhereHas('member', fn ($m) => $m->where('member_no', 'like', "%{$term}%"));
         });
     }
 

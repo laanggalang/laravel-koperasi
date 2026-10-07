@@ -52,6 +52,7 @@
                 <thead>
                     <tr>
                         <x-sort-link column="door_no" label="No. Pintu" :sortBy="$sortBy" :sortDir="$sortDir" />
+                        <x-sort-link column="member_no" label="ID Pemegang" :sortBy="$sortBy" :sortDir="$sortDir" />
                         <x-sort-link column="member" label="Pemegang" :sortBy="$sortBy" :sortDir="$sortDir" />
                         <x-sort-link column="driver" label="Pengemudi" :sortBy="$sortBy" :sortDir="$sortDir" />
                         <x-sort-link column="plate" label="Plat" :sortBy="$sortBy" :sortDir="$sortDir" />
@@ -65,6 +66,9 @@
                     @forelse($doorNumbers as $np)
                     <tr>
                         <td class="whitespace-nowrap font-mono font-bold text-indigo-600">{{ $np->door_no }}</td>
+                        <td class="whitespace-nowrap text-gray-700 font-medium">
+                            {{ $np->member?->member_no ?? '-' }}
+                        </td>
                         <td class="whitespace-nowrap text-gray-700 font-medium">
                             {{ $np->holder_display }}
                         </td>
