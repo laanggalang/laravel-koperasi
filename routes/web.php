@@ -10,7 +10,9 @@ use App\Http\Controllers\DoorNumberController;
 use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
 // 📊 Dashboard Utama: Bisa diakses semua role yang sudah login (Admin, Ketua, Bendahara, Staff, Anggota)
