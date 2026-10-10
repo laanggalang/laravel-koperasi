@@ -58,8 +58,31 @@
 
                 <div>
                     <label for="vehicle_type" class="block text-sm font-medium text-gray-700">Jenis Kendaraan</label>
-                    <input type="text" name="vehicle_type" id="vehicle_type" value="{{ old('vehicle_type', $doorNumber->vehicle_type) }}"
-                        class="form-input-custom mt-1 block w-full">
+                    <!-- <input type="text" name="vehicle_type" id="vehicle_type" value="{{ old('vehicle_type', $doorNumber->vehicle_type) }}"
+                        class="form-input-custom mt-1 block w-full"> -->
+                    <select
+                        name="vehicle_type"
+                        id="vehicle_type"
+                        class="form-input-custom mt-1 block w-full"
+                    >
+                        <option value="">-- Pilih Jenis Kendaraan --</option>
+                        <option value="Pick Up"
+                            {{ old('vehicle_type', $doorNumber->vehicle_type) == 'Pick Up' ? 'selected' : '' }}>
+                            Pick Up
+                        </option>
+                        <option value="Pick Up Box"
+                            {{ old('vehicle_type', $doorNumber->vehicle_type) == 'Pick Up Box' ? 'selected' : '' }}>
+                            Pick Up Box
+                        </option>
+                        <option value="Blind Van"
+                            {{ old('vehicle_type', $doorNumber->vehicle_type) == 'Blind Van' ? 'selected' : '' }}>
+                            Blind Van
+                        </option>
+                        <option value="Truk Engkel"
+                            {{ old('vehicle_type', $doorNumber->vehicle_type) == 'Truk Engkel' ? 'selected' : '' }}>
+                            Truk Engkel
+                        </option>
+                    </select>
                     @error('vehicle_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
