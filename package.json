@@ -1,5 +1,6 @@
 {
     "private": true,
+    "name": "laravel-koperasi",
     "type": "module",
     "scripts": {
         "dev": "vite",
