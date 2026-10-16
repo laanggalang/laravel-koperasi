@@ -8,6 +8,8 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\DoorNumberController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SparepartController;
+use App\Http\Controllers\SaleController;
 
 Route::get('/', function () {
     return auth()->check()
@@ -52,6 +54,15 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,bendahara,staff')->group(function () {
         Route::resource('/savings', SavingController::class);
         Route::resource('/installments', InstallmentController::class);
+
+        // 🔧 Sparepart: master barang + restock
+        Route::resource('/spareparts', SparepartController::class);
+        Route::put('/spareparts/{sparepart}/status', [SparepartController::class, 'updateStatus'])->name('spareparts.updateStatus');
+        Route::get('/spareparts/{sparepart}/restock', [SparepartController::class, 'restockForm'])->name('spareparts.restockForm');
+        Route::post('/spareparts/{sparepart}/restock', [SparepartController::class, 'restock'])->name('spareparts.restock');
+
+        // 🧾 Penjualan sparepart (kasir + riwayat)
+        Route::resource('/sales', SaleController::class);
     });
 
     /**
